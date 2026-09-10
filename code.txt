@@ -1,0 +1,140 @@
+1. # Python File Operations
+
+# 1. Create and Write to a file
+file = open("student.txt", "w")
+
+file.write("Student Name: Abcd\n")
+file.write("Course: M.Sc Computer Science\n")
+file.write("Subject: Python Programming\n")
+
+file.close()
+
+print("File created and data written successfully.")
+
+
+# 2. Read the file
+file = open("student.txt", "r")
+
+data = file.read()
+
+print("\nContents of the file:")
+print(data)
+
+file.close()
+
+
+# 3. Append data to the file
+file = open("student.txt", "a")
+
+file.write("Topic: File Operations\n")
+file.write("Department: Computer Science\n")
+
+file.close()
+
+print("Data appended successfully.")
+
+
+# 4. Read the updated file
+file = open("student.txt", "r")
+
+print("\nUpdated file contents:")
+print(file.read())
+
+file.close()
+
+2. Important File Modes
+Mode	Meaning
+"r"	Read an existing file
+"w"	Write/create a file; overwrites existing content
+"a"	Append data to the end of a file
+"x"	Create a new file; error if it already exists
+"r+"	Read and write
+"w+"	Write and read; overwrites file
+"a+"	Append and read
+
+
+3. # Student Marks - File Operations
+
+filename = "marks.txt"
+
+# 1. Write student data into the file
+with open(filename, "w") as file:
+    file.write("101,Anita,85\n")
+    file.write("102,Ravi,78\n")
+    file.write("103,Priya,92\n")
+    file.write("104,Arun,67\n")
+
+print("Student records written successfully.")
+
+
+# 2. Read and display all records
+with open(filename, "r") as file:
+    print("\nStudent Records:")
+    
+    for line in file:
+        print(line.strip())
+
+
+# 3. Append a new student
+with open(filename, "a") as file:
+    file.write("105,Meena,88\n")
+
+print("\nNew student record added.")
+
+
+# 4. Search for a student
+search_name = input("\nEnter student name to search: ")
+
+found = False
+
+with open(filename, "r") as file:
+    for line in file:
+        data = line.strip().split(",")
+
+        if data[1].lower() == search_name.lower():
+            print("Student Found")
+            print("Roll No :", data[0])
+            print("Name    :", data[1])
+            print("Marks   :", data[2])
+            found = True
+            break
+
+if not found:
+    print("Student not found.")
+
+
+# 5. Count number of students
+with open(filename, "r") as file:
+    count = sum(1 for line in file)
+
+print("\nTotal number of students:", count)
+
+output:
+Student records written successfully.
+
+Student Records:
+101,Anita,85
+102,Ravi,78
+103,Priya,92
+104,Arun,67
+
+New student record added.
+
+Enter student name to search: Priya
+
+Student Found
+Roll No : 103
+Name    : Priya
+Marks   : 92
+
+Total number of students: 5
+
+Concepts covered
+
+Create/write a file — "w"
+Read a file — "r"
+Append records — "a"
+Search data from a file
+Split comma-separated data
+Count records
+Using with open() for safe file handling
