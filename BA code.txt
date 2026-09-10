@@ -1,0 +1,425 @@
+# ============================================================
+# BUSINESS ANALYTICS AND PREDICTION
+# Dataset: Business_Analytics_500_Rows.xlsx
+# ============================================================
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+
+
+# ------------------------------------------------------------
+# 1. LOAD THE EXCEL DATASET
+# ------------------------------------------------------------
+
+file_path = "Business_Analytics_500_Rows.xlsx"
+
+df = pd.read_excel(file_path, sheet_name="500 Row Dataset")
+
+print("Dataset loaded successfully!")
+print("Number of rows:", df.shape[0])
+print("Number of columns:", df.shape[1])
+
+
+# ------------------------------------------------------------
+# 2. DISPLAY BASIC INFORMATION
+# ------------------------------------------------------------
+
+print("\nFirst 10 records:")
+print(df.head(10))
+
+print("\nDataset Information:")
+print(df.info())
+
+print("\nStatistical Summary:")
+print(df.describe())
+
+
+# ------------------------------------------------------------
+# 3. CHECK FOR MISSING VALUES
+# ------------------------------------------------------------
+
+print("\nMissing Values:")
+print(df.isnull().sum())
+
+
+# ------------------------------------------------------------
+# 4. BUSINESS KPI ANALYSIS
+# ------------------------------------------------------------
+
+total_sales = df["Sales"].sum()
+total_profit = df["Profit"].sum()
+average_sales = df["Sales"].mean()
+average_profit = df["Profit"].mean()
+total_quantity = df["Quantity"].sum()
+average_rating = df["Customer_Rating"].mean()
+total_marketing = df["Marketing_Spend"].sum()
+
+profit_margin = (total_profit / total_sales) * 100
+sales_marketing_ratio = total_sales / total_marketing
+
+print("\n================ BUSINESS KPIs ================")
+
+print("Total Sales          : ₹", round(total_sales, 2))
+print("Total Profit         : ₹", round(total_profit, 2))
+print("Average Sales/Order  : ₹", round(average_sales, 2))
+print("Average Profit/Order : ₹", round(average_profit, 2))
+print("Total Quantity       :", total_quantity)
+print("Average Rating       :", round(average_rating, 2))
+print("Marketing Spend      : ₹", round(total_marketing, 2))
+print("Profit Margin        :", round(profit_margin, 2), "%")
+print("Sales/Marketing Ratio:", round(sales_marketing_ratio, 2))
+
+
+# ------------------------------------------------------------
+# 5. REGION-WISE ANALYTICS
+# ------------------------------------------------------------
+
+region_analysis = df.groupby("Region").agg(
+    Total_Sales=("Sales", "sum"),
+    Total_Profit=("Profit", "sum"),
+    Quantity=("Quantity", "sum"),
+    Average_Rating=("Customer_Rating", "mean")
+).sort_values("Total_Sales", ascending=False)
+
+print("\n================ REGION ANALYSIS ================")
+print(region_analysis)
+
+# Best region
+best_region = region_analysis["Total_Sales"].idxmax()
+
+print("\nBest Performing Region:", best_region)
+
+
+# ------------------------------------------------------------
+# 6. PRODUCT-WISE ANALYTICS
+# ------------------------------------------------------------
+
+product_analysis = df.groupby("Product").agg(
+    Total_Sales=("Sales", "sum"),
+    Total_Profit=("Profit", "sum"),
+    Quantity=("Quantity", "sum"),
+    Average_Rating=("Customer_Rating", "mean")
+).sort_values("Total_Profit", ascending=False)
+
+print("\n================ PRODUCT ANALYSIS ================")
+print(product_analysis)
+
+best_product = product_analysis["Total_Profit"].idxmax()
+
+print("\nMost Profitable Product:", best_product)
+
+
+# ------------------------------------------------------------
+# 7. CUSTOMER TYPE ANALYSIS
+# ------------------------------------------------------------
+
+customer_analysis = df.groupby("Customer_Type").agg(
+    Total_Sales=("Sales", "sum"),
+    Total_Profit=("Profit", "sum"),
+    Number_of_Orders=("Order_ID", "count"),
+    Average_Rating=("Customer_Rating", "mean")
+)
+
+print("\n================ CUSTOMER ANALYSIS ================")
+print(customer_analysis)
+
+
+# ------------------------------------------------------------
+# 8. CORRELATION ANALYSIS
+# ------------------------------------------------------------
+
+numeric_columns = [
+    "Sales",
+    "Quantity",
+    "Discount",
+    "Profit",
+    "Marketing_Spend",
+    "Customer_Rating"
+]
+
+correlation = df[numeric_columns].corr()
+
+print("\n================ CORRELATION MATRIX ================")
+print(correlation)
+
+
+# ------------------------------------------------------------
+# 9. VISUALIZATION - SALES BY REGION
+# ------------------------------------------------------------
+
+plt.figure(figsize=(8, 5))
+
+region_analysis["Total_Sales"].plot(kind="bar")
+
+plt.title("Total Sales by Region")
+plt.xlabel("Region")
+plt.ylabel("Sales")
+plt.xticks(rotation=0)
+plt.tight_layout()
+plt.show()
+
+
+# ------------------------------------------------------------
+# 10. VISUALIZATION - PROFIT BY PRODUCT
+# ------------------------------------------------------------
+
+plt.figure(figsize=(9, 5))
+
+product_analysis["Total_Profit"].plot(kind="bar")
+
+plt.title("Total Profit by Product")
+plt.xlabel("Product")
+plt.ylabel("Profit")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+
+# ------------------------------------------------------------
+# 11. MARKETING SPEND VS SALES
+# ------------------------------------------------------------
+
+plt.figure(figsize=(8, 5))
+
+sns.scatterplot(
+    data=df,
+    x="Marketing_Spend",
+    y="Sales"
+)
+
+plt.title("Marketing Spend vs Sales")
+plt.xlabel("Marketing Spend")
+plt.ylabel("Sales")
+plt.tight_layout()
+plt.show()
+
+
+# ------------------------------------------------------------
+# 12. CORRELATION HEATMAP
+# ------------------------------------------------------------
+
+plt.figure(figsize=(9, 7))
+
+sns.heatmap(
+    correlation,
+    annot=True,
+    cmap="coolwarm",
+    fmt=".2f"
+)
+
+plt.title("Business Data Correlation Matrix")
+plt.tight_layout()
+plt.show()
+
+
+# ============================================================
+# PREDICTION SECTION
+# ============================================================
+
+# ------------------------------------------------------------
+# 13. SELECT FEATURES FOR PREDICTION
+# ------------------------------------------------------------
+
+# We will predict SALES using:
+# Marketing Spend
+# Quantity
+# Discount
+# Profit
+
+X = df[
+    [
+        "Marketing_Spend",
+        "Quantity",
+        "Discount",
+        "Profit"
+    ]
+]
+
+y = df["Sales"]
+
+
+# ------------------------------------------------------------
+# 14. SPLIT DATA INTO TRAINING AND TESTING
+# ------------------------------------------------------------
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.20,
+    random_state=42
+)
+
+print("\n================ PREDICTION MODEL ================")
+
+print("Training records:", len(X_train))
+print("Testing records :", len(X_test))
+
+
+# ------------------------------------------------------------
+# 15. CREATE LINEAR REGRESSION MODEL
+# ------------------------------------------------------------
+
+model = LinearRegression()
+
+model.fit(X_train, y_train)
+
+
+# ------------------------------------------------------------
+# 16. PREDICT SALES
+# ------------------------------------------------------------
+
+y_pred = model.predict(X_test)
+
+
+# ------------------------------------------------------------
+# 17. MODEL PERFORMANCE
+# ------------------------------------------------------------
+
+mae = mean_absolute_error(y_test, y_pred)
+
+mse = mean_squared_error(y_test, y_pred)
+
+rmse = mse ** 0.5
+
+r2 = r2_score(y_test, y_pred)
+
+print("\n================ MODEL PERFORMANCE ================")
+
+print("Mean Absolute Error :", round(mae, 2))
+print("Mean Squared Error  :", round(mse, 2))
+print("Root Mean Squared Error:", round(rmse, 2))
+print("R² Score            :", round(r2, 4))
+
+
+# ------------------------------------------------------------
+# 18. REGRESSION COEFFICIENTS
+# ------------------------------------------------------------
+
+print("\n================ MODEL COEFFICIENTS ================")
+
+for feature, coefficient in zip(X.columns, model.coef_):
+
+    print(
+        feature,
+        ":",
+        round(coefficient, 2)
+    )
+
+print("Intercept:", round(model.intercept_, 2))
+
+
+# ------------------------------------------------------------
+# 19. ACTUAL VS PREDICTED SALES
+# ------------------------------------------------------------
+
+comparison = pd.DataFrame({
+    "Actual Sales": y_test.values,
+    "Predicted Sales": y_pred
+})
+
+print("\nActual vs Predicted Sales:")
+print(comparison.head(20))
+
+
+# ------------------------------------------------------------
+# 20. VISUALIZE ACTUAL VS PREDICTED SALES
+# ------------------------------------------------------------
+
+plt.figure(figsize=(8, 6))
+
+plt.scatter(
+    y_test,
+    y_pred
+)
+
+plt.xlabel("Actual Sales")
+plt.ylabel("Predicted Sales")
+
+plt.title("Actual Sales vs Predicted Sales")
+
+# Perfect prediction line
+minimum = min(y_test.min(), y_pred.min())
+maximum = max(y_test.max(), y_pred.max())
+
+plt.plot(
+    [minimum, maximum],
+    [minimum, maximum],
+    linestyle="--"
+)
+
+plt.tight_layout()
+plt.show()
+
+
+# ============================================================
+# 21. PREDICT SALES FOR A NEW BUSINESS SCENARIO
+# ============================================================
+
+# Example:
+# Marketing Spend = ₹8,000
+# Quantity = 5
+# Discount = 10%
+# Expected Profit = ₹20,000
+
+new_data = pd.DataFrame({
+    "Marketing_Spend": [8000],
+    "Quantity": [5],
+    "Discount": [10],
+    "Profit": [20000]
+})
+
+predicted_sales = model.predict(new_data)
+
+print("\n================ NEW SALES PREDICTION ================")
+
+print(
+    "Predicted Sales = ₹",
+    round(predicted_sales[0], 2)
+)
+
+
+# ------------------------------------------------------------
+# 22. FINAL BUSINESS INSIGHTS
+# ------------------------------------------------------------
+
+print("\n================ BUSINESS INSIGHTS ================")
+
+print("1. Best performing region:", best_region)
+
+print("2. Most profitable product:", best_product)
+
+print(
+    "3. Total sales generated: ₹",
+    round(total_sales, 2)
+)
+
+print(
+    "4. Total profit generated: ₹",
+    round(total_profit, 2)
+)
+
+print(
+    "5. Profit margin:",
+    round(profit_margin, 2),
+    "%"
+)
+
+print(
+    "6. Average customer rating:",
+    round(average_rating, 2)
+)
+
+print(
+    "7. Model R² score:",
+    round(r2, 4)
+)
+
+print(
+    "8. Predicted sales for the new scenario: ₹",
+    round(predicted_sales[0], 2)
+)
