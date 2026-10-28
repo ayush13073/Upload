@@ -1,0 +1,1 @@
+print("%-10s | %-10s | %-10s" %("Name","City","Marks"))

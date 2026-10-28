@@ -1,0 +1,10 @@
+all.txt
+all1.txt
+hello
+meowfile1.txt
+meowfile2.txt
+meowfile3.txt
+meowq3.py
+meowquestion3.py
+path.txt
+q3.py

@@ -1,0 +1,4 @@
+Python is a popular programming language.
+Python is easy to learn and use.
+Many people love Python programming.
+Data science uses Python a lot.
